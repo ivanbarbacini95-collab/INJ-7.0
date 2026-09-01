@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07090d">
+  <meta name="description" content="Dashboard essenziale per monitorare wallet e staking Injective.">
+  <title>INJ Monitor</title>
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('inj_monitor_theme') || 'dark';
+    } catch (_) {}
+  </script>
+  <link rel="stylesheet" href="style.css?v=12.0">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="INJ Monitor, torna in alto">
+        <span class="brand-mark" aria-hidden="true">I</span>
+        <span><strong>INJ</strong> Monitor</span>
+      </a>
+
+      <div class="topbar-actions">
+        <div class="connection" id="connectionStatus" role="status" aria-live="polite">
+          <i></i><span id="statusText">Connessione…</span>
+        </div>
+        <button class="icon-button" id="currencyButton" type="button" aria-label="Cambia valuta" title="Cambia valuta">$</button>
+        <button class="icon-button" id="privacyButton" type="button" aria-label="Nascondi valori" title="Nascondi valori">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.6"/></svg>
+        </button>
+        <button class="icon-button" id="themeButton" type="button" aria-label="Cambia tema" title="Cambia tema">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.5 8.5 0 1 1 8.8 4a7 7 0 0 0 11.2 11.2Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="wallet-bar" aria-label="Selezione wallet">
+        <form class="address-form" id="addressForm">
+          <label for="addressInput">Wallet Injective</label>
+          <div class="address-field">
+            <input id="addressInput" name="address" autocomplete="off" spellcheck="false" placeholder="inj1…" aria-describedby="addressHelp">
+            <button id="loadButton" type="submit">Analizza</button>
+          </div>
+          <small id="addressHelp">L’indirizzo resta salvato solo su questo dispositivo.</small>
+        </form>
+        <div class="sync-block">
+          <span>Ultimo aggiornamento</span>
+          <strong id="lastUpdate">—</strong>
+          <button class="refresh-button" id="refreshButton" type="button" aria-label="Aggiorna tutti i dati">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6v5h-5M4 18v-5h5M18.4 9A7 7 0 0 0 6.8 6.4L4 11m16 2-2.8 4.6A7 7 0 0 1 5.6 15"/></svg>
+            Aggiorna
+          </button>
+        </div>
+      </section>
+
+      <section class="overview-grid" aria-label="Riepilogo Injective">
+        <article class="data-card market-card" id="marketCard">
+          <div class="card-label-row">
+            <span class="card-label">INJ / USDT</span>
+            <span class="live-tag"><i></i>LIVE</span>
+          </div>
+          <div class="market-value-row">
+            <strong class="hero-number" id="marketPrice">$—</strong>
+            <span class="market-change neutral" id="marketChange">—</span>
+          </div>
+          <div class="market-range">
+            <span>Min 24h <b id="dayLow">—</b></span>
+            <span>Max 24h <b id="dayHigh">—</b></span>
+          </div>
+        </article>
+
+        <article class="data-card worth-card" id="worthCard">
+          <div class="card-label-row">
+            <span class="card-label">Patrimonio totale</span>
+            <span class="wallet-state" id="walletState">Wallet non caricato</span>
+          </div>
+          <strong class="hero-number private" id="netWorthUsd">—</strong>
+          <span class="hero-secondary private" id="netWorthInj">0,0000 INJ</span>
+          <div class="allocation" aria-label="Distribuzione patrimonio"><i id="allocationBar"></i></div>
+          <div class="allocation-labels">
+            <span><i class="dot staked"></i>Staking <b id="stakedShare">0%</b></span>
+            <span><i class="dot liquid"></i>Liquido <b id="liquidShare">0%</b></span>
+          </div>
+        </article>
+      </section>
+
+      <section class="metrics-grid" aria-label="Dati principali del wallet">
+        <article class="data-card metric-card" id="availableCard">
+          <span class="card-label">Disponibile</span>
+          <strong class="metric-value private" id="availableInj">0,000000 INJ</strong>
+          <small class="private" id="availableUsd">—</small>
+        </article>
+        <article class="data-card metric-card" id="stakedCard">
+          <span class="card-label">In staking</span>
+          <strong class="metric-value private" id="stakedInj">0,000000 INJ</strong>
+          <small class="private" id="stakedUsd">—</small>
+        </article>
+        <article class="data-card metric-card" id="rewardsCard">
+          <span class="card-label">Reward maturate</span>
+          <strong class="metric-value private" id="rewardsInj">0,000000 INJ</strong>
+          <small class="private" id="rewardsUsd">—</small>
+        </article>
+        <article class="data-card metric-card apr-card" id="aprCard">
+          <div class="card-label-row">
+            <span class="card-label">APR netto personale</span>
+            <span class="info-badge" title="Calcolato sulle delegazioni reali del wallet e al netto delle commissioni dei validator">NETTO</span>
+          </div>
+          <strong class="metric-value" id="aprValue">—</strong>
+          <small id="aprSource">Carica un wallet con INJ in staking</small>
+        </article>
+      </section>
+
+      <section class="detail-grid">
+        <article class="data-card yield-card" id="yieldCard">
+          <div class="section-heading">
+            <div><span class="card-label">Rendimento stimato</span><h2>Quanto produce lo staking</h2></div>
+            <span class="formula-pill">APR personale</span>
+          </div>
+          <div class="yield-grid">
+            <div><span>Al giorno</span><strong class="private" id="dailyEstimate">—</strong><small class="private" id="dailyUsd">—</small></div>
+            <div><span>In 30 giorni</span><strong class="private" id="monthlyEstimate">—</strong><small class="private" id="monthlyUsd">—</small></div>
+            <div><span>In un anno</span><strong class="private" id="yearlyEstimate">—</strong><small class="private" id="yearlyUsd">—</small></div>
+          </div>
+          <p class="method-note" id="aprMethod">La stima usa solo gli INJ effettivamente delegati dall’indirizzo, con commissioni e stato di ciascun validator.</p>
+        </article>
+
+        <article class="data-card validator-card" id="validatorCard">
+          <div class="section-heading">
+            <div><span class="card-label">Delegazioni attive</span><h2>Validator</h2></div>
+            <span class="count-pill" id="validatorCount">0</span>
+          </div>
+          <div class="validator-list" id="validatorList">
+            <div class="empty-state">Carica un wallet per vedere dove sono delegati gli INJ.</div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer><span>INJ Monitor <b>v12.0</b></span><span id="endpointLabel">Rete Injective</span></footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js?v=12.0" defer></script>
+</body>
+</html>
